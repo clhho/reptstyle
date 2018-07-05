@@ -7,10 +7,10 @@ from torchvision import transforms
 
 
 class ImageFolder(torch.utils.data.Dataset):
-    def __init__(self, folder, transform=None, extension='.jpg'):
+    def __init__(self, folder, transform=None):
         super().__init__()
 
-        self.images = sorted(glob(osp.join(folder, f'*{extension}')))
+        self.images = sorted(glob(osp.join(folder, '*')))
 
         if transform is not None:
             self.transform = transform
