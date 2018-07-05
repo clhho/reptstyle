@@ -11,8 +11,15 @@ class TransferNet(nn.Module):
         layers = []
         for i in range(7):
             layers.extend(self._layer(self.num_channels if i > 0 else 3, 3, 2**i))
-            layers.extend(self._layer(self.num_channels, 3, 1))
-            layers.append(nn.Conv2d(self.num_channels, 3, 1))
+        layers.extend(self._layer(self.num_channels, 3, 1))
+        layers.append(nn.Conv2d(self.num_channels, 3, 1))
+
+        for layer in layers:
+            if not isinstance(layer, nn.Conv2d):
+                continue
+            w = layer.weight
+            mid = (w.shape[-1] - 1) // 2
+            nn.init.eye_(w[:, :, mid, mid])
 
         self.model = nn.Sequential(*layers)
 
@@ -26,10 +33,14 @@ class TransferNet(nn.Module):
         ]
 
     def forward(self, input):
-        return self.model(input)
+        out = self.model(input)
+        out -= out.min()
+        out /= out.max() + 1e-8
+        return out
 
 
 def test_transfer_net():
     net = TransferNet()
+    print(net)
     inp = torch.randn(2, 3, 224, 224)
     print(net(inp).shape)
