@@ -10,7 +10,7 @@ class ImageFolder(torch.utils.data.Dataset):
     def __init__(self, folder, transform=None):
         super().__init__()
 
-        self.images = sorted(glob(osp.join(folder, '*')))
+        self.images = sorted(glob(osp.join(folder, '*')))[1:]
 
         if transform is not None:
             self.transform = transform
@@ -21,7 +21,8 @@ class ImageFolder(torch.utils.data.Dataset):
         return self.transform(Image.open(self.images[index]).convert('RGB'))
 
     def __len__(self):
-        return len(self.images)
+        return 500
+        # return len(self.images)
 
 
 def test_dataset():
